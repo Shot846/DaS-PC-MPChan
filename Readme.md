@@ -1,3 +1,12 @@
+My Quick Changes
+============
+- Only for 'Modsouls.exe'.
+- Changed process hooking:
+-- Requires you to launch Modsouls through the application, but this allows it
+   to run through Wine.
+- Unfortunately, there might be JIT errors below wine 7.6, but that does not stop
+  the program from working :)
+
 Instructions
 ============
 
