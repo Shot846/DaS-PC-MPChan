@@ -747,23 +747,23 @@ Public Class MainWindow
         MainWindow.twoheld = twoKey
     End Sub
     Private Sub attachDSProcess() Handles dsAttachmentTimer.Tick
-        If dsProcess IsNot Nothing Then
-            If Not dsProcess.IsAttached Then
-                dsProcess.Dispose()
-                dsProcess = Nothing
-            End If
-        End If
-        If dsProcess Is Nothing Then
-            Try
-                dsProcess = New DarkSoulsProcess()
-                dsProcessStatus.Text = " Attached to Dark Souls process"
-                dsProcessStatus.BackColor = System.Drawing.Color.FromArgb(200, 255, 200)
-                dsProcess.enableDebugLog = chkLoggerEnabled.Checked
-            Catch ex As DSProcessAttachException
-                dsProcessStatus.Text = " " & ex.Message
-                dsProcessStatus.BackColor = System.Drawing.Color.FromArgb(255, 200, 200)
-            End Try
-        End If
+        'If dsProcess IsNot Nothing Then
+        '    If Not dsProcess.IsAttached Then
+        '        dsProcess.Dispose()
+        '        dsProcess = Nothing
+        '    End If
+        'End If
+        'If dsProcess Is Nothing Then
+        '    Try
+        '        dsProcess = New DarkSoulsProcess()
+        '        dsProcessStatus.Text = " Attached to Dark Souls process"
+        '        dsProcessStatus.BackColor = System.Drawing.Color.FromArgb(200, 255, 200)
+        '        dsProcess.enableDebugLog = chkLoggerEnabled.Checked
+        '    Catch ex As DSProcessAttachException
+        '        dsProcessStatus.Text = " " & ex.Message
+        '        dsProcessStatus.BackColor = System.Drawing.Color.FromArgb(255, 200, 200)
+        '    End Try
+        'End If
     End Sub
 
     Private Sub chkDebugDrawing_CheckedChanged(sender As Object, e As EventArgs) Handles chkDebugDrawing.CheckedChanged
@@ -1081,7 +1081,21 @@ Public Class MainWindow
     Private Sub btnLaunchDS_Click(sender As Object, e As EventArgs) Handles btnLaunchDS.Click
         Try
             Dim proc As New System.Diagnostics.Process()
-            proc = Process.Start("steam://rungameid/211420", "")
+            'MsgBox(My.Computer.FileSystem.CurrentDirectory)'
+            'MsgBox(My.Computer.FileSystem.CurrentDirectory + "\MODSOULS.exe")'
+            proc = Process.Start(My.Computer.FileSystem.CurrentDirectory + "\MODSOULS.exe", "-phantom-break-off")
+            Thread.Sleep(3000)
+            If dsProcess Is Nothing Then
+                Try
+                    dsProcess = New DarkSoulsProcess(proc)
+                    dsProcessStatus.Text = " Attached to Dark Souls process"
+                    dsProcessStatus.BackColor = System.Drawing.Color.FromArgb(200, 255, 200)
+                    dsProcess.enableDebugLog = chkLoggerEnabled.Checked
+                Catch ex As DSProcessAttachException
+                    dsProcessStatus.Text = " " & ex.Message
+                    dsProcessStatus.BackColor = System.Drawing.Color.FromArgb(255, 200, 200)
+                End Try
+            End If
         Catch ex As Exception
             MsgBox("Error launching." & Environment.NewLine & ex.Message)
         End Try

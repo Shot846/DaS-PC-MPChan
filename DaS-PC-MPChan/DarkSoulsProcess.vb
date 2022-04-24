@@ -184,10 +184,12 @@ Public Class DarkSoulsProcess
 
     Protected disposed As Boolean = False
 
-    Sub New()
-        attachToProcess()
+    Sub New(ByVal proc As Process)
+        ' attachToProcess()'
+
         'Give the process a little time to start up
-        Thread.Sleep(200)
+        Thread.Sleep(2000)
+        attachToProcessMan(proc)
         findDllAddresses()
         Dim beta = (ReadUInt32(dsBase + &H80) = &HE91B11E2&)
         If beta Then
@@ -244,9 +246,9 @@ Public Class DarkSoulsProcess
             Try
                 _targetProcess = proc
                 _targetProcessHandle = OpenProcess(PROCESS_ALL_ACCESS, False, _targetProcess.Id)
-            If _targetProcessHandle = 0 Then
-                Throw New DSProcessAttachException("OpenProcess() failed. Check Permissions")
-            End If
+                If _targetProcessHandle = 0 Then
+                    Throw New DSProcessAttachException("OpenProcess() failed. Check Permissions")
+                End If
             Catch ex As Exception
 
             End Try
@@ -254,10 +256,28 @@ Public Class DarkSoulsProcess
             MessageBox.Show("Already attached! (Please Detach first?)")
         End If
     End Sub
+
+    Private Sub attachToProcessMan(ByVal proc As Process)
+        If _targetProcessHandle = IntPtr.Zero Then 'not already attached
+
+            Try
+                _targetProcess = proc
+                _targetProcessHandle = OpenProcess(PROCESS_ALL_ACCESS, False, _targetProcess.Id)
+                If _targetProcessHandle = 0 Then
+                    Throw New DSProcessAttachException("OpenProcess() failed. Check Permissions")
+                End If
+            Catch ex As Exception
+
+            End Try
+        Else
+            MessageBox.Show("Already attached! (Please Detach first?)")
+        End If
+    End Sub
+
     Private Sub findDllAddresses()
         For Each dll As ProcessModule In _targetProcess.Modules
             Select Case dll.ModuleName.ToLower
-                Case "darksouls.exe"
+                Case "modsouls.exe"
                     dsBase = dll.BaseAddress
 
                 Case "d3d9.dll"
@@ -273,6 +293,9 @@ Public Class DarkSoulsProcess
         If dsBase = 0 Then Throw New DSProcessAttachException("Couldn't find Dark Souls base address")
         If steamApiBase = 0 Then Throw New DSProcessAttachException("Couldn't find Steam API base address")
     End Sub
+
+
+
     Private Sub disableLowFPSDisonnect()
         If ReadUInt8(dsBase + &HAFC39F) = &H74& Then
             WriteBytes(dsBase + &HAFC39F, {&HEB})
