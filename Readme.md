@@ -1,5 +1,6 @@
 My Quick Changes
 ============
+## Wine Compatibility for Modsouls
 - Only for 'Modsouls.exe'.
 - Changed process hooking:
 -- Requires you to launch Modsouls through the application, but this allows it
